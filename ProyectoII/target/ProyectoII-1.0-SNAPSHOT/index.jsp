@@ -17,8 +17,8 @@
         <tr colspan="2">
             <td><input type="submit" value="Enviar"/></td>
         </tr>
-        <tr colspan="2">
-            <td><input type="submit" value="Historial"/></td>
+        <tr>
+            <td><input type="reset" value="Borrar"></td>
         </tr>
     </table>
 </form>
