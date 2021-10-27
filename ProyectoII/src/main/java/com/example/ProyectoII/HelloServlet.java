@@ -7,10 +7,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
-
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.Reader;
 
 
 
@@ -18,7 +26,8 @@ import java.util.Stack;
 public class HelloServlet extends HttpServlet {
     private String message;
     static Pila operators = new Pila();
-
+    String NombreArchivo = "pruebas.csv";
+    public static final String SEPARADOR=";";
 
     public void init() {
         message = "Historial";
@@ -186,13 +195,37 @@ public class HelloServlet extends HttpServlet {
         DateTimeFormatter Fecha = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
         InetAddress address = InetAddress.getLocalHost();
         System.out.println("IP Local :" + address.getHostAddress());
+        String Datos = null;
 
+        BufferedReader br = null;
 
+        try {
+
+            br =new BufferedReader(new FileReader(NombreArchivo));
+            String line = br.readLine();
+            while (null!=line) {
+                String [] fields = line.split(SEPARADOR);
+                System.out.println(Arrays.toString(fields));
+                Datos = Arrays.toString(fields);
+                //fields = removeTrailingQuotes(fields);
+                //System.out.println(Arrays.toString(fields));
+
+                line = br.readLine();
+            }
+
+        } catch (Exception e) {
+
+        } finally {
+            if (null!=br) {
+                br.close();
+            }
+        }
     // Hello
     PrintWriter out = response.getWriter();
         out.println("<html><body>");
         out.println("<h1>"+message +"</h1>");
-        out.println("<h2>"+Fecha.format(LocalDateTime.now())+"</h2>");
+        out.println("<h2>"+"<tr>"+"<td>"+"Expresión, "+"</td>"+"<td>"+"Resultado, "+"</td>"+"<td>"+"Fecha"+"</td>"+"</tr>"+"</h2>");
+        out.println("<h2>"+Datos+"</h2>");
         out.println("</body></html>");
     }
 
@@ -220,11 +253,28 @@ public class HelloServlet extends HttpServlet {
             out.println("La expresión enviada es: " + Expresion);
             out.println("<br/>");
             out.println("El resultado de la expresión es: " + Resultado);
-            out.println("<br/>");
-            out.println("La fecha cuando se envio la expresion fue: " + Fecha.format(LocalDateTime.now()));
         }
 
+
+        try {
+            FileWriter fw = new FileWriter(NombreArchivo,true);
+            BufferedWriter bw= new BufferedWriter(fw);
+            PrintWriter pw = new PrintWriter(bw);
+
+            pw.println(Expresion+","+Resultado+","+Fecha.format(LocalDateTime.now()));
+            pw.flush();
+            pw.close();
+
+            //JOptionPane.showMessageDialog(null,"Record saved");
+
+
+
+
+        }catch (Exception E){
+            //JOptionPane.showMessageDialog(null,"Record not saved");
+        }
     }
+
     public void destroy() {
     }
 
