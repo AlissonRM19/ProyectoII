@@ -7,9 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.InetAddress;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -21,12 +18,12 @@ import java.io.IOException;
 import java.io.Reader;
 
 
-
 @WebServlet(name = "helloServlet", value = "/hello-servlet")
 public class HelloServlet extends HttpServlet {
     private String message;
     static Pila operators = new Pila();
-    String NombreArchivo = "pruebas.csv";
+    // colocar la ruta de la computadora donde esta el archivo
+    String NombreArchivo = "C:\\Users\\Greva\\IdeaProjects\\ProyectoII\\pruebas.csv";;
     public static final String SEPARADOR=";";
 
     public void init() {
@@ -47,7 +44,6 @@ public class HelloServlet extends HttpServlet {
                 postfix.append(symbol);
             else if (Character.isDigit(symbol))
                 postfix.append(symbol);
-
             else if (symbol == '(')
 //push (
             {
@@ -82,8 +78,6 @@ public class HelloServlet extends HttpServlet {
 
     // Method to evaluate value of a postfix expression
     static int evaluatePostfix(String postfix) {
-        //create a stack
-        //Stack<Integer> stack=new Stack<>();
 
         // Scan all characters one by one
         for (int i = 0; i < postfix.length(); i++) {
@@ -145,9 +139,7 @@ public class HelloServlet extends HttpServlet {
             System.out.print(t.value + " ");
             inorder(t.right);
         }
-
     }
-
     // Returns root of constructed tree for given
     // postfix expression
     Node constructTree(char postfix[]) {
@@ -175,12 +167,10 @@ public class HelloServlet extends HttpServlet {
                 t.right = t1;
                 t.left = t2;
 
-                // System.out.println(t1 + "" + t2);
                 // Add this subexpression to stack
                 st.push(t);
             }
         }
-
         //  only element will be root of expression
         // tree
         t = st.peek();
@@ -196,49 +186,46 @@ public class HelloServlet extends HttpServlet {
         InetAddress address = InetAddress.getLocalHost();
         System.out.println("IP Local :" + address.getHostAddress());
         String Datos = null;
+        String[] dato = null;
 
         BufferedReader br = null;
 
         try {
-
             br =new BufferedReader(new FileReader(NombreArchivo));
             String line = br.readLine();
             while (null!=line) {
                 String [] fields = line.split(SEPARADOR);
-                System.out.println(Arrays.toString(fields));
                 Datos = Arrays.toString(fields);
-                //fields = removeTrailingQuotes(fields);
-                //System.out.println(Arrays.toString(fields));
-
+                dato= fields;
                 line = br.readLine();
             }
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
 
         } finally {
-            if (null!=br) {
+            if (null != br) {
                 br.close();
             }
         }
-    // Hello
-    PrintWriter out = response.getWriter();
+        PrintWriter out = response.getWriter();
         out.println("<html><body>");
         out.println("<h1>"+message +"</h1>");
-        out.println("<h2>"+"<tr>"+"<td>"+"Expresión, "+"</td>"+"<td>"+"Resultado, "+"</td>"+"<td>"+"Fecha"+"</td>"+"</tr>"+"</h2>");
-        out.println("<h2>"+Datos+"</h2>");
+        out.println("<h2>"+"<tr>"+"<td>"+"Expresión, "+"</td>"+"<td>"+"Resultado, "+"</td>"+"<td>"+"Fecha, "+"</td>"+"<td>"+"Nombre"+"</td>"+"</tr>"+"</h2>");
+        out.println("<h2>"+Arrays.toString(dato)+"</h2>");
         out.println("</body></html>");
+
     }
-
-
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String Expresion = request.getParameter("expresionrecibida");
+        String Nombre = request.getParameter("NombreCliente");
         String Postfix = toPostfix(Expresion);
         String Resultado = String.valueOf(evaluatePostfix(Postfix));
         DateTimeFormatter Fecha = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-
+        String[] dato = null;
         response.setContentType("text/html;charset=UTF-8");
 
         HelloServlet et = new HelloServlet();
@@ -247,31 +234,27 @@ public class HelloServlet extends HttpServlet {
         System.out.println("La expresión del árbol es");
         et.inorder(root);
 
-
         try(PrintWriter out = response.getWriter()) {
 
             out.println("La expresión enviada es: " + Expresion);
             out.println("<br/>");
             out.println("El resultado de la expresión es: " + Resultado);
+            out.println("<br/>");
+            out.println("El nombre del cliente que envio la expresión es:" + Nombre);
         }
-
 
         try {
             FileWriter fw = new FileWriter(NombreArchivo,true);
             BufferedWriter bw= new BufferedWriter(fw);
             PrintWriter pw = new PrintWriter(bw);
 
-            pw.println(Expresion+","+Resultado+","+Fecha.format(LocalDateTime.now()));
+            pw.println(Expresion+","+Resultado+","+Fecha.format(LocalDateTime.now())+","+Nombre);
+            if (Nombre == Arrays.toString(dato))
+                return;
             pw.flush();
             pw.close();
-
-            //JOptionPane.showMessageDialog(null,"Record saved");
-
-
-
-
-        }catch (Exception E){
-            //JOptionPane.showMessageDialog(null,"Record not saved");
+        }
+        catch (Exception E){
         }
     }
 

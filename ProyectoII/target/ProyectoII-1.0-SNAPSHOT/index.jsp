@@ -11,6 +11,10 @@
 <form method="post" action="hello-servlet">
     <table>
         <tr>
+            <td>Nombre</td>
+            <td><input type="text" name="NombreCliente"/></td>
+        </tr>
+        <tr>
             <td>Expresión</td>
             <td><input type="text" name="expresionrecibida"/></td>
         </tr>
